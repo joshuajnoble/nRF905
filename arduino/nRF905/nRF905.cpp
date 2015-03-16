@@ -6,20 +6,28 @@
  * Web: http://blog.zakkemble.co.uk/nrf905-avrarduino-librarydriver/
  */
 
+
+
 #include <string.h>
+
+#include "nRF905.h"
+#include "nRF905_config.h"
+#include "nRF905_defs.h"
+#include "nRF905_types.h"
+
+#ifndef NRF_58122
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
+ #include <util/delay.h>
+#endif
+
 #ifdef ARDUINO
 #include <Arduino.h>
 #include <SPI.h>
 #else
 #include "nRF905_spi.h"
 #endif
-#include "nRF905.h"
-#include "nRF905_config.h"
-#include "nRF905_defs.h"
-#include "nRF905_types.h"
+
 
 #define noinline __attribute__ ((__noinline__))
 
@@ -152,7 +160,7 @@ void nRF905_init()
 	digitalWrite(CSN, HIGH);
 
 	SPI.begin();
-	SPI.setClockDivider(SPI_CLOCK_DIV2);
+	//SPI.setClockDivider(SPI_CLOCK_DIV2);
 #else
 	TRX_EN_DDR |= _BV(TRX_EN_BIT);
 	PWR_MODE_DDR |= _BV(PWR_MODE_BIT);
@@ -179,7 +187,12 @@ void nRF905_init()
 	enableStandbyMode();
 	receiveMode();
 	nRF905_powerDown();
+
+	#ifdef NRF_58122
+	delay(3);
+	#else
 	_delay_ms(3);
+	#endif
 	defaultConfig();
 
 #if NRF905_INTERRUPTS
@@ -435,7 +448,11 @@ bool nRF905_send()
 	radio.state = NRF905_RADIO_STATE_TX;
 
 	// Pulse standby pin to start transmission
-	_delay_us(14);
+	#ifdef NRF_58122
+		delayMicroseconds(14);
+	#else
+		_delay_us(14);
+	#endif
 
 #if NRF905_AUTO_RETRAN == NRF905_AUTO_RETRAN_DISABLE
 	// Radio will go back into standby mode after transmission, unless nRF905_receive()
@@ -549,7 +566,11 @@ void nRF905_powerUp()
 	powerUp();
 
 	// Give it time to turn on
+	#ifdef NRF_58122
+	delay(3);
+	#else
 	_delay_ms(3);
+	#endif
 }
 
 void nRF905_powerDown()
