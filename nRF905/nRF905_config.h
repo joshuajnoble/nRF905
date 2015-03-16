@@ -19,9 +19,11 @@
 // NRF905_CLK_20MHZ
 #define NRF905_CLK_FREQ		NRF905_CLK_16MHZ
 
+#define NRF_58122 1
+
 // Use pin interrupt for data ready
 // NOTE: If you have other devices connected that use the SPI bus then you will need to call nRF905_interrupt_off() before using SPI comms and then RF905_interrupt_on() once you've finished.
-#define NRF905_INTERRUPTS	1
+#define NRF905_INTERRUPTS	0
 
 // Buffer count
 // Only used if interrupts are used (see NRF905_INTERRUPTS)
